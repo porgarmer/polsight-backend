@@ -20,7 +20,7 @@ class CandidateVoteAdmin(admin.ModelAdmin):
 class ElectionResultAdmin(admin.ModelAdmin):
     list_display = [
         "election_year", 
-        "registered_votes",
+        "registered_voters",
         "voters_who_voted",
         "turnout"
     ]

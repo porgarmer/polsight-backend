@@ -100,3 +100,80 @@ class CandidateVoteSerializer(serializers.ModelSerializer):
         model = CandidateVoteData
         fields = "__all__"
         read_only_fields = ["esi", "rpi", "normalized_vs"]
+        
+    def create(self, validated_data):
+        candidate_votes = validated_data.get("candidate_votes", 0)
+        total_votes_for_position = validated_data.get("total_votes_for_position", 0)
+        
+        if total_votes_for_position == 0:
+            raise serializers.ValidationError("Cannot divide by zero.")
+        
+        elif candidate_votes is None or total_votes_for_position is None:
+            raise serializers.ValidationError("Please enter a value for both the candidate votes and total votes for position.")
+        
+        normalized_vs = round(candidate_votes / total_votes_for_position, 2)
+        validated_data["normalized_vs"] = normalized_vs
+        
+        is_winner = validated_data.get("is_winner")
+        #if the candidate is the winner, the relative performance index (RPI) is 1.00
+        
+        election_year = validated_data.get("election_year")
+        position = validated_data.get("position_ran")
+        if is_winner:
+            rpi = 1.00
+        else:
+            winner_candidate = float(CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first())
+            
+            if not winner_candidate:
+                serializers.ValidationError("The winner candidate for that election year, for that position does not exist. Please enter it first")
+            
+            rpi = round(normalized_vs / winner_candidate.normalized_vs)
+        validated_data["rpi"] = rpi
+        
+        taf = ElectionResult.objects.filter(election_year=election_year).first().taf
+        esi = (0.5*float(normalized_vs)) + (0.3*float(rpi)) + (0.2*float(taf))
+        validated_data["esi"] = esi
+        
+        candidate_vote_data = CandidateVoteData.objects.create(**validated_data)
+        
+        return candidate_vote_data
+    
+    def update(self, instance, validated_data):
+        candidate_votes = validated_data.get("candidate_votes", 0)
+        total_votes_for_position = validated_data.get("total_votes_for_position", 0)
+        
+        if total_votes_for_position == 0:
+            raise serializers.ValidationError("Cannot divide by zero.")
+        
+        elif candidate_votes is None or total_votes_for_position is None:
+            raise serializers.ValidationError("Please enter a value for both the candidate votes and total votes for position.")
+        
+        normalized_vs = round(candidate_votes / total_votes_for_position, 2)
+        validated_data["normalized_vs"] = normalized_vs
+        
+        is_winner = validated_data.get("is_winner")
+        #if the candidate is the winner, the relative performance index (RPI) is 1.00
+        
+        election_year = validated_data.get("election_year")
+        position = validated_data.get("position_ran")
+        if is_winner:
+            rpi = 1.00
+        else:
+            winner_candidate = float(CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first())
+            
+            if not winner_candidate:
+                serializers.ValidationError("The winner candidate for that election year, for that position does not exist. Please enter it first")
+            
+            rpi = round(normalized_vs / winner_candidate.normalized_vs)
+        validated_data["rpi"] = rpi
+        
+        taf = ElectionResult.objects.filter(election_year=election_year).first().taf
+        esi = (0.5*float(normalized_vs)) + (0.3*float(rpi)) + (0.2*float(taf))
+        validated_data["esi"] = esi
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        instance.save()
+        
+        return instance

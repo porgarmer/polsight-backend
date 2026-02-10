@@ -83,3 +83,4 @@ class CandidateVoteDataViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         super().update(request, *args, **kwargs)
         return Response(data={"detail": "Voter data updated added."})
+    

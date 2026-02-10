@@ -8,6 +8,14 @@ class ElectionResult(models.Model):
     voters_who_voted = models.IntegerField(null=True, blank=True)
     turnout_volatility = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
     turnout = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    
+    #Turnout Adjustment Factor
+    #A normalization factor that accounts for how participation levels compare to historical norms.
+    taf = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    
+    def __str__(self):
+        return f"Election Year {self.election_year}"
+    
 
 class Candidate(models.Model):
     class FamilyGroupChoices(models.TextChoices):
@@ -31,9 +39,16 @@ class CandidateVoteData(models.Model):
     candidate_votes = models.IntegerField(null=True, blank=True)
     total_votes_for_position = models.IntegerField(null=True, blank=True)
     
-class CandidatePerformanceMetrics(models.Model):
-    election_year = models.IntegerField(null=True, blank=True)
+    #Electoral Strengh Index
+    #A composite index that represents a candidate’s general capacity to attract voter support, regardless of position.
     esi = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
-    rsi = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    
+    #Relative Performance Index
+    #A measure of how close a candidate’s performance is to the winner in the same contest.
+    rpi = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    
+    #Normalized Vote Share 
+    #The proportion of votes a candidate received relative to all votes cast for the position they contested.
     normalized_vs = models.DecimalField(null=True, blank=True, decimal_places=4, max_digits=10)
     
+

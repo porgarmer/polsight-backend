@@ -5,6 +5,8 @@ from .serializer import CandidateSerializer, CandidateVoteSerializer, ElectionRe
 from .models import Candidate, ElectionResult, CandidateVoteData
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
 
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
@@ -65,10 +67,14 @@ class ElectionResultViewSet(viewsets.ModelViewSet):
             status=200
         )
             
+class CandidateVoteDataFilter(django_filters.FilterSet):
+    candidate = django_filters.CharFilter("candidate__name", lookup_expr="icontains")
     
 class CandidateVoteDataViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateVoteSerializer
     queryset = CandidateVoteData.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CandidateVoteDataFilter
     
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

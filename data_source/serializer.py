@@ -14,13 +14,14 @@ class ElectionResultSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         voters_who_voted = validated_data.get("voters_who_voted", 0)
         registered_voters = validated_data.get("registered_voters", 0)
-        
+        print(validated_data)
         if registered_voters == 0:
             raise serializers.ValidationError("Cannot divide by zero.")
         
         turnout = round(voters_who_voted/registered_voters, 2)
+        validated_data["turnout"] = turnout
 
-        election_result = ElectionResult.objects.create(turnout=turnout, **validated_data)
+        election_result = ElectionResult.objects.create(**validated_data)
         
         return election_result
     

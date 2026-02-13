@@ -16,6 +16,10 @@ class CandidateVoteAdmin(admin.ModelAdmin):
         "candidate_votes"
     ]
     
+    list_filter = [
+        "candidate"
+    ]
+    
 @admin.register(ElectionResult)
 class ElectionResultAdmin(admin.ModelAdmin):
     list_display = [
@@ -24,3 +28,4 @@ class ElectionResultAdmin(admin.ModelAdmin):
         "voters_who_voted",
         "turnout"
     ]
+    

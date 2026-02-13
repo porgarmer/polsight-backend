@@ -4,6 +4,8 @@ from django.db.models import Sum
 import statistics
 
 class CandidateSerializer(serializers.ModelSerializer):
+    # positions_ran = serializers.SerializerMethodField()
+    # related_candidates
     class Meta:
         model = Candidate
         fields = "__all__"
@@ -96,11 +98,16 @@ class ElectionResultSerializer(serializers.ModelSerializer):
         return instance
     
 class CandidateVoteSerializer(serializers.ModelSerializer):
+    candidate_name = serializers.CharField(source="candidate.name", read_only=True)
+    taf = serializers.SerializerMethodField()
     class Meta:
         model = CandidateVoteData
         fields = "__all__"
         read_only_fields = ["esi", "rpi", "normalized_vs"]
         
+    def get_taf(self, obj):
+        return ElectionResult.objects.filter(election_year=obj.election_year).first().taf
+    
     def create(self, validated_data):
         candidate_votes = validated_data.get("candidate_votes", 0)
         total_votes_for_position = validated_data.get("total_votes_for_position", 0)
@@ -122,12 +129,12 @@ class CandidateVoteSerializer(serializers.ModelSerializer):
         if is_winner:
             rpi = 1.00
         else:
-            winner_candidate = float(CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first())
+            winner_candidate = CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first()
             
             if not winner_candidate:
                 serializers.ValidationError("The winner candidate for that election year, for that position does not exist. Please enter it first")
             
-            rpi = round(normalized_vs / winner_candidate.normalized_vs)
+            rpi = round(normalized_vs / float(winner_candidate.normalized_vs), 2)
         validated_data["rpi"] = rpi
         
         taf = ElectionResult.objects.filter(election_year=election_year).first().taf
@@ -159,12 +166,13 @@ class CandidateVoteSerializer(serializers.ModelSerializer):
         if is_winner:
             rpi = 1.00
         else:
-            winner_candidate = float(CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first())
+            winner_candidate = CandidateVoteData.objects.filter(election_year=election_year, position_ran=position, is_winner=True).first()
             
             if not winner_candidate:
                 serializers.ValidationError("The winner candidate for that election year, for that position does not exist. Please enter it first")
             
-            rpi = round(normalized_vs / winner_candidate.normalized_vs)
+            rpi = round(normalized_vs / float(winner_candidate.normalized_vs), 2)
+            
         validated_data["rpi"] = rpi
         
         taf = ElectionResult.objects.filter(election_year=election_year).first().taf

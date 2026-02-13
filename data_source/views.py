@@ -10,7 +10,7 @@ import django_filters
 
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
-    queryset = Candidate.objects.all()
+    queryset = Candidate.objects.all().order_by("-created_at")
     parser_classes = [MultiPartParser, FormParser, FileUploadParser]
     
     def create(self, request, *args, **kwargs):

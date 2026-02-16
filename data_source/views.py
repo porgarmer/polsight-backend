@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
+from electoral_sys_backend.pagination import CustomPageNumberPagination
 
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
@@ -24,7 +25,8 @@ class CandidateViewSet(viewsets.ModelViewSet):
 
 class ElectionResultViewSet(viewsets.ModelViewSet):
     serializer_class = ElectionResultSerializer
-    queryset = ElectionResult.objects.all()
+    queryset = ElectionResult.objects.all().order_by("-election_year")
+    pagination_class = CustomPageNumberPagination
     
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

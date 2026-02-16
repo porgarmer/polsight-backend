@@ -26,7 +26,7 @@ class Candidate(models.Model):
     profile = models.ImageField(null=True, blank=True, upload_to="candiate-profile/")
     name = models.CharField(max_length=50, null=True, blank=True)
     family_group = models.TextField(choices=FamilyGroupChoices, null=True, blank=True)
-    related_candidate = models.ForeignKey('self', null=True, blank=True, related_name='related_candidates', on_delete=models.PROTECT)
+    related_candidate = models.ForeignKey('self', null=True, blank=True, related_name='related_candidates', on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

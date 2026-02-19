@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 
 def predict_esi():
-    candites_esi = CandidateVoteData.objects.filter(candidate__name="Paz Radaza").exclude(election_year__in=[2025,2022]).order_by("election_year").values_list("esi", flat=True)
+    candites_esi = CandidateVoteData.objects.filter(candidate__name="Paz Radaza").order_by("election_year").values_list("esi", flat=True)
     candites_esi = [float(esi) for esi in candites_esi]
     print(candites_esi)
     y = np.array(candites_esi, dtype=float)
@@ -29,5 +29,8 @@ def predict_esi():
     high = esi_hat + 1.96 * sigma
     
     return esi_hat, low, high
+
+def generate_ai_insights(candidate):
+    pass
 
 print(predict_esi())

@@ -74,9 +74,10 @@ class CandidateVoteDataFilter(django_filters.FilterSet):
     
 class CandidateVoteDataViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateVoteSerializer
-    queryset = CandidateVoteData.objects.all()
+    queryset = CandidateVoteData.objects.all().order_by("election_year")
     filter_backends = [DjangoFilterBackend]
     filterset_class = CandidateVoteDataFilter
+    pagination_class = CustomPageNumberPagination
     
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

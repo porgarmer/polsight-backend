@@ -19,13 +19,17 @@ class ElectionResultSerializer(serializers.ModelSerializer):
     def create(self, validated_data):        
         voters_who_voted = validated_data.get("voters_who_voted", 0)
         registered_voters = validated_data.get("registered_voters", 0)
-
+        election_year = int(validated_data.get("election_year", 0))
+        
         if registered_voters == 0:
             raise serializers.ValidationError("Cannot divide by zero.")
         
         elif voters_who_voted is None or registered_voters is None:
             raise serializers.ValidationError("Please enter a value for both the registered voters and voters who voted.")
         
+        if ElectionResult.objects.filter(election_year=election_year):
+            raise serializers.ValidationError(detail={"detail":"Election year already has data."})
+
         turnout = round(voters_who_voted/registered_voters, 2)
         validated_data["turnout"] = turnout
         

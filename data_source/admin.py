@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Candidate, CandidateVoteData, ElectionResult
+from .models import Candidate, CandidateVoteData, ElectionResult, AIInsights, CandidateAchievements
 # Register your models here.
 
 @admin.register(Candidate)
@@ -28,4 +28,20 @@ class ElectionResultAdmin(admin.ModelAdmin):
         "voters_who_voted",
         "turnout"
     ]
+    
+@admin.register(AIInsights)
+class AIInishgtsAdmin(admin.ModelAdmin):
+    list_display = [
+        "candidate", 
+        "created_at",
+    ]
+    
+    
+@admin.register(CandidateAchievements)
+class CandidateAchievementAdmin(admin.ModelAdmin):
+    list_display = [
+        "candidate", 
+        "created_at",
+    ]
+    
     

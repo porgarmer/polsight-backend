@@ -29,6 +29,7 @@ class Candidate(models.Model):
     related_candidate = models.ForeignKey('self', null=True, blank=True, related_name='related_candidates', on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     
+    
     def __str__(self):
         return self.name
     
@@ -36,6 +37,7 @@ class CandidateVoteData(models.Model):
     class PositionChoices(models.TextChoices):
         MAYOR = "mayor", _("Mayor")
         CONGRESSMAN = "congressman", _("Congressman")
+        VICEMAYOR = "vice mayor", _("Vice Mayor")
     candidate = models.ForeignKey(Candidate, related_name="data", on_delete=models.PROTECT)
     election_year = models.IntegerField(null=True, blank=True)
     position_ran = models.TextField(choices=PositionChoices, null=True, blank=True)
@@ -57,3 +59,19 @@ class CandidateVoteData(models.Model):
     normalized_vs = models.DecimalField(null=True, blank=True, decimal_places=4, max_digits=10)
     
 
+class AIInsights(models.Model):
+    insight = models.TextField(null=True, blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
+    candidate = candidate = models.ForeignKey(Candidate, related_name="ai_insights", on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.candidate.name
+    
+class CandidateAchievements(models.Model):
+    achievement = models.TextField(null=True, blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
+    candidate = candidate = models.ForeignKey(Candidate, related_name="achievements", on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.candidate.name
+    

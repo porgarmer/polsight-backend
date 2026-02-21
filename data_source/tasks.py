@@ -1,4 +1,4 @@
-from django_init import djanog_init
+from django_init import django_init
 from .models import CandidateVoteData
 import numpy as np
 from sklearn.linear_model import LinearRegression

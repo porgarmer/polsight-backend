@@ -6,9 +6,25 @@ import statistics
 class CandidateSerializer(serializers.ModelSerializer):
     # positions_ran = serializers.SerializerMethodField()
     # related_candidates
+    ai_insight = serializers.SerializerMethodField()
+    achievement = serializers.SerializerMethodField()
     class Meta:
         model = Candidate
         fields = "__all__"
+        
+    def get_ai_insight(self, obj):
+        insight = obj.ai_insights.order_by("-created_at").first()
+        if insight:
+            return insight.insight
+        else:
+            return None  
+        
+    def get_achievement(self, obj):
+        achievement = obj.achievements.order_by("-created_at").first()
+        if achievement:
+            return achievement.achievement
+        else:
+            return None  
         
 class ElectionResultSerializer(serializers.ModelSerializer):
     class Meta:

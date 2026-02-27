@@ -75,3 +75,21 @@ class CandidateAchievements(models.Model):
     def __str__(self):
         return self.candidate.name
     
+class ESIForecast(models.Model):
+    candidate = candidate = models.ForeignKey(Candidate, related_name="esi_forecast", on_delete=models.PROTECT)
+    election_year = models.IntegerField(null=True, blank=True)
+    predicted_value = models.TextField(null=True, blank=True)
+    lower_bound = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    upper_bound = models.DecimalField(null=True, blank=True, decimal_places=2, max_digits=10)
+    model =  models.TextField(null=True, blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)    
+    def __str__(self):
+        return self.candidate.name
+    
+class CandidateSocialMediaActivity(models.Model):
+    social_media_activity = models.TextField(null=True, blank=True)
+    created_at =  models.DateTimeField(auto_now_add=True)
+    candidate = candidate = models.ForeignKey(Candidate, related_name="social_media_activity", on_delete=models.PROTECT)
+    
+    def __str__(self):
+        return self.candidate.name

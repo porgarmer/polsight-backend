@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Candidate, CandidateVoteData, ElectionResult, AIInsights, CandidateAchievements
+from .models import (
+    Candidate, 
+    CandidateVoteData, 
+    ElectionResult, 
+    AIInsights, 
+    CandidateAchievements,
+    ESIForecast,
+    CandidateSocialMediaActivity
+)
 # Register your models here.
 
 @admin.register(Candidate)
@@ -44,4 +52,16 @@ class CandidateAchievementAdmin(admin.ModelAdmin):
         "created_at",
     ]
     
+@admin.register(ESIForecast)
+class ESIForecastAdmin(admin.ModelAdmin):
+    list_display = [
+        "candidate",
+        "created_at"
+    ]
     
+@admin.register(CandidateSocialMediaActivity)
+class CandidateSocialMediaActivityAdmin(admin.ModelAdmin):
+    list_display = [
+        "candidate",
+        "created_at"
+    ]

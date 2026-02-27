@@ -7,5 +7,6 @@ router.register(r"candidate", viewset=views.CandidateViewSet, basename="candidat
 router.register(r"candidate-data", viewset=views.CandidateVoteDataViewSet, basename="candidate_data")
 router.register(r'election-result', viewset=views.ElectionResultViewSet, basename="election_results")
 urlpatterns = [
-   path("", include(router.urls))
+   path("", include(router.urls)),
+   path("esi-forecast/", view=views.ESIForecastView.as_view(), name="esi_forecast")
 ]

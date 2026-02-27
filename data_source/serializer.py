@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Candidate, ElectionResult, CandidateVoteData
+from .models import Candidate, ElectionResult, CandidateVoteData, ESIForecast
 from django.db.models import Sum
 import statistics
 
@@ -8,6 +8,8 @@ class CandidateSerializer(serializers.ModelSerializer):
     # related_candidates
     ai_insight = serializers.SerializerMethodField()
     achievement = serializers.SerializerMethodField()
+    social_media_activity = serializers.SerializerMethodField()
+    positions_held = serializers.SerializerMethodField()
     class Meta:
         model = Candidate
         fields = "__all__"
@@ -25,6 +27,22 @@ class CandidateSerializer(serializers.ModelSerializer):
             return achievement.achievement
         else:
             return None  
+    
+    def get_social_media_activity(self, obj):
+        social_media_activity = obj.social_media_activity.order_by("-created_at").first()
+        if social_media_activity:
+            return social_media_activity.social_media_activity
+        else:
+            return None
+        
+    def get_positions_held(self, obj):
+        positions_ran = obj.data.values_list("position_ran", flat=True)
+        positions_ran = set(positions_ran)
+
+        if positions_ran:
+            return ", ".join(position.title() for position in positions_ran)
+        return None
+        
         
 class ElectionResultSerializer(serializers.ModelSerializer):
     class Meta:
@@ -205,3 +223,8 @@ class CandidateVoteSerializer(serializers.ModelSerializer):
         instance.save()
         
         return instance
+    
+class ESIForecastSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ESIForecast
+        fields = "__all__"

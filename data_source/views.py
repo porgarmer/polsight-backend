@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from rest_framework import views, viewsets
+from rest_framework import views, viewsets, status
 from rest_framework.parsers import MultiPartParser, FormParser,FileUploadParser
-from .serializer import CandidateSerializer, CandidateVoteSerializer, ElectionResultSerializer
-from .models import Candidate, ElectionResult, CandidateVoteData
+from .serializer import CandidateSerializer, CandidateVoteSerializer, ElectionResultSerializer, ESIForecastSerializer
+from .models import Candidate, ElectionResult, CandidateVoteData, ESIForecast
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
@@ -87,3 +87,19 @@ class CandidateVoteDataViewSet(viewsets.ModelViewSet):
         super().update(request, *args, **kwargs)
         return Response(data={"detail": "Voter data updated added."})
     
+class ESIForecastView(views.APIView):
+    
+    def get_queryset(self, candidate_id):
+        return ESIForecast.objects.filter(candidate__id=candidate_id).latest("created_at")
+    
+    
+    def get(self, request):
+        candidate_id = request.query_params.get("candidate_id")
+        
+        if not candidate_id:
+            return Response({"detail": "Please provide a candidate id"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        queryset = self.get_queryset(candidate_id=candidate_id)
+        serializer = ESIForecastSerializer(queryset)
+        return Response(serializer.data)
+        

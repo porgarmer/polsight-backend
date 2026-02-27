@@ -1,12 +1,19 @@
 from django_init import django_init
-from .models import CandidateVoteData
+from .models import CandidateVoteData, Candidate, ESIForecast
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-def predict_esi():
-    candites_esi = CandidateVoteData.objects.filter(candidate__name="Paz Radaza").order_by("election_year").values_list("esi", flat=True)
-    candites_esi = [float(esi) for esi in candites_esi]
-    print(candites_esi)
+def predict_esi(candidate):
+    candites_esi = CandidateVoteData.objects.filter(candidate=candidate).order_by("election_year").values_list("election_year", "esi")
+    
+    latest_election_cycle = candites_esi.last()[0]
+    
+    #election is every three years
+    election_cyle_interval = 3
+    next_election_cyle = latest_election_cycle + election_cyle_interval
+    
+    candites_esi = [float(esi[1]) for esi in candites_esi]
+    
     y = np.array(candites_esi, dtype=float)
     
     X = np.arange(len(y)).reshape(-1, 1)
@@ -15,7 +22,7 @@ def predict_esi():
     model.fit(X, y)
     
     t_next = np.array([[len(y)]])
-    esi_hat = model.predict(t_next)[0]
+    esi_hat = round(model.predict(t_next)[0], 2)
     
     y_pred = model.predict(X)
     residuals = y - y_pred
@@ -28,9 +35,25 @@ def predict_esi():
     low = esi_hat - 1.96 * sigma
     high = esi_hat + 1.96 * sigma
     
-    return esi_hat, low, high
+    return next_election_cyle, esi_hat, low, high
+
+def store_candidate_esi_prediction():
+    candidates = Candidate.objects.all()
+    
+    for candidate in candidates:
+        year, predicted_value, lower_bound, upper_bound = predict_esi(candidate)
+        ESIForecast.objects.create(
+            candidate=candidate,
+            election_year=year,
+            predicted_value=predicted_value,
+            lower_bound=lower_bound,
+            upper_bound=upper_bound,
+            model="Linear Regression"
+        )
 
 def generate_ai_insights(candidate):
-    pass
+    candidates = Candidate.objects.all()
+    
 
-print(predict_esi())
+
+store_candidate_esi_prediction()

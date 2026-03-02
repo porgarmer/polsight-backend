@@ -12,22 +12,31 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR/".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-f#s1*6+y*vc8$oovobt(9=f!#7eqvi_!s0tnn90v+l%)!yd8l1'
+
+DJANGO_ENV = os.getenv("DJANGO_ENV", "development").lower()
+IS_PROD = DJANGO_ENV == "production"
+
+SECRET_KEY = os.getenv(key="SECRET_KEY", default="")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["*"]
-
+if IS_PROD:
+    DEBUG = False
+    ALLOWED_HOSTS = []
+   
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "192.168.56.1", "192.168.68.3"]
 
 # Application definition
 
@@ -41,8 +50,7 @@ INSTALLED_APPS = [
     
     #myapps 
     'data_source',
-    
-    
+
     #third party apps
     'corsheaders',
     'rest_framework',
@@ -77,17 +85,18 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'electoral_sys_backend.wsgi.application'
-
+#WSGI_APPLICATION = 'electoral_sys_backend.wsgi.application'
+ASGI_APPLICATION = "electoral_sys_backend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+DB_URL = os.getenv("DB_URL", "sqlite:///db.sqlite3")
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=DB_URL,
+    )
 }
 
 
@@ -134,14 +143,39 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:9000",
-    "http://localhost:8501",
-    "http://localhost:3000",
-]
+if IS_PROD:
+    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "")
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:8080",
+        "http://127.0.0.1:9000",
+        "http://localhost:3000",
+        "http://192.168.56.1:3000",
+    ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "data_source.authentication.CookieJWTAuthentication",
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+if IS_PROD:
+    SECURE_SSL_REDIRECT = True 
+
+    SESSION_COOKIE_SECURE = True
+
+    CSRF_COOKIE_SECURE = True
+
+    SECURE_HSTS_SECONDS = 31536000 
+
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+    SECURE_HSTS_PRELOAD = True
+
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") 
+
+    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").lower()

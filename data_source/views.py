@@ -8,33 +8,35 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from electoral_sys_backend.pagination import CustomPageNumberPagination
-
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 class CandidateViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated&IsAdminUser]
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all().order_by("-created_at")
     parser_classes = [MultiPartParser, FormParser, FileUploadParser]
     
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
-        return Response(data={"detail": "Candidate successfully added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Candidate successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
-        return Response(data={"detail": "Candidate updated added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Candidate updated added."}, status=response.status_code)
 
 
 class ElectionResultViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated&IsAdminUser]
     serializer_class = ElectionResultSerializer
     queryset = ElectionResult.objects.all().order_by("-election_year")
     pagination_class = CustomPageNumberPagination
     
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
-        return Response(data={"detail": "Voter data successfully added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Voter data successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
-        return Response(data={"detail": "Voter data updated added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Voter data updated added."}, status=response.status_code)
     
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
@@ -73,6 +75,7 @@ class CandidateVoteDataFilter(django_filters.FilterSet):
     candidate = django_filters.CharFilter("candidate__name", lookup_expr="icontains")
     
 class CandidateVoteDataViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated&IsAdminUser]
     serializer_class = CandidateVoteSerializer
     queryset = CandidateVoteData.objects.all().order_by("election_year")
     filter_backends = [DjangoFilterBackend]
@@ -80,15 +83,15 @@ class CandidateVoteDataViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPageNumberPagination
     
     def create(self, request, *args, **kwargs):
-        super().create(request, *args, **kwargs)
-        return Response(data={"detail": "Voter data successfully added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Voter data successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        super().update(request, *args, **kwargs)
-        return Response(data={"detail": "Voter data updated added."})
+        response = super().create(request, *args, **kwargs)
+        return Response(data={"detail": "Voter data updated added."}, status=response.status_code)
     
 class ESIForecastView(views.APIView):
-    
+    permission_classes = [IsAuthenticated&IsAdminUser]
     def get_queryset(self, candidate_id):
         return ESIForecast.objects.filter(candidate__id=candidate_id).latest("created_at")
     
@@ -103,3 +106,8 @@ class ESIForecastView(views.APIView):
         serializer = ESIForecastSerializer(queryset)
         return Response(serializer.data)
         
+class MeView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"username": request.user.username})

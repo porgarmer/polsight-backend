@@ -32,7 +32,7 @@ SECRET_KEY = os.getenv(key="SECRET_KEY", default="")
 # SECURITY WARNING: don't run with debug turned on in production!
 if IS_PROD:
     DEBUG = False
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ["polsight-backend-production.up.railway.app", "polsight-backend.railway.internal"]
    
 else:
     DEBUG = True

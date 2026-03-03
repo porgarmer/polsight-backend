@@ -38,8 +38,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             key="refresh",
             value=refresh,
             httponly=True,
-            secure=settings.DEBUG is False,
-            samesite="Lax" if not settings.DEBUG else None,
+            secure=cookie_secure,
+            samesite=cookie_samesite,
             max_age=7 * 24 * 60 * 60,  # 7 days
         )
 

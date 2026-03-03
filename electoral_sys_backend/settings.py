@@ -173,8 +173,12 @@ REST_FRAMEWORK = {
 
 if IS_PROD:
     SECURE_SSL_REDIRECT = True 
+    
+    SESSION_COOKIE_SAMESITE = 'None' 
 
     SESSION_COOKIE_SECURE = True
+
+    CSRF_COOKIE_SAMESITE = 'None' 
 
     CSRF_COOKIE_SECURE = True
 
@@ -186,4 +190,8 @@ if IS_PROD:
 
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https") 
 
-    CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").lower().split(",")
+    CSRF_TRUSTED_ORIGINS = [
+        origin.strip() 
+        for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",") 
+        if origin.strip()
+    ]

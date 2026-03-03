@@ -21,13 +21,16 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
         response = Response({"detail": "Login successful"}, status=status.HTTP_200_OK)
 
+        cookie_secure = not settings.DEBUG  # True in production
+        cookie_samesite = 'None' if not settings.DEBUG else 'Lax'
+
         # Set HTTP-only cookies
         response.set_cookie(
             key="access",
             value=access,
             httponly=True,
-            secure=settings.DEBUG is False,  # IMPORTANT in production
-            samesite="Lax" if not settings.DEBUG else None,
+            secure=cookie_secure,  # IMPORTANT in production
+            samesite=cookie_samesite,
             max_age=60 * 60,  # 1 hour
         )
 
@@ -57,12 +60,16 @@ class CookieTokenRefreshView(TokenRefreshView):
         access = serializer.validated_data["access"]
 
         response = Response({"detail": "Token refreshed"})
+        
+        cookie_secure = not settings.DEBUG
+        cookie_samesite = 'None' if not settings.DEBUG else 'Lax'
+        
         response.set_cookie(
             key="access",
             value=access,
             httponly=True,
-            secure=True,
-            samesite="Lax",
+            secure=cookie_secure,
+            samesite=cookie_samesite,
             max_age=60 * 60,
         )
 
@@ -72,20 +79,23 @@ class CookieLogoutView(views.APIView):
     def post(self, request, *args, **kwargs):
         response = Response({"detail": "Logout successful"}, status=status.HTTP_200_OK)
         
+        cookie_secure = not settings.DEBUG
+        cookie_samesite = 'None' if not settings.DEBUG else 'Lax'
+        
         # Clear access token cookie
         response.delete_cookie(
             key="access",
             path="/",
-            domain=settings.SESSION_COOKIE_DOMAIN,  # Optional: set if using subdomains
-            samesite="Lax" if not settings.DEBUG else None,
+            secure=cookie_secure,
+            samesite=cookie_samesite,
         )
         
         # Clear refresh token cookie
         response.delete_cookie(
             key="refresh",
             path="/",
-            domain=settings.SESSION_COOKIE_DOMAIN,
-            samesite="Lax" if not settings.DEBUG else None,
+            secure=cookie_secure,
+            samesite=cookie_samesite,
         )
         
         return response

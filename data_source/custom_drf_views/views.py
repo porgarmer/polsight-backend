@@ -86,7 +86,6 @@ class CookieLogoutView(views.APIView):
         response.delete_cookie(
             key="access",
             path="/",
-            secure=cookie_secure,
             samesite=cookie_samesite,
         )
         
@@ -94,7 +93,6 @@ class CookieLogoutView(views.APIView):
         response.delete_cookie(
             key="refresh",
             path="/",
-            secure=cookie_secure,
             samesite=cookie_samesite,
         )
         

@@ -170,7 +170,7 @@ REST_FRAMEWORK = {
 }
 
 if IS_PROD:
-    SECURE_SSL_REDIRECT = True 
+    SECURE_SSL_REDIRECT = False 
     
     SESSION_COOKIE_SAMESITE = 'None' 
 

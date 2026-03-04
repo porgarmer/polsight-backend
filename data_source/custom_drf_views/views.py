@@ -22,7 +22,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         response = Response({"detail": "Login successful"}, status=status.HTTP_200_OK)
 
         cookie_secure = not settings.DEBUG  # True in production
-        cookie_samesite = 'None' if not settings.DEBUG else 'Lax'
+        cookie_samesite = 'Lax'
 
         # Set HTTP-only cookies
         response.set_cookie(
@@ -62,7 +62,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         response = Response({"detail": "Token refreshed"})
         
         cookie_secure = not settings.DEBUG
-        cookie_samesite = 'None' if not settings.DEBUG else 'Lax'
+        cookie_samesite = 'Lax'
         
         response.set_cookie(
             key="access",

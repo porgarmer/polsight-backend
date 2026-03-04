@@ -153,14 +153,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_CREDENTIALS = True
 
-if IS_PROD:
-    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
-else:
-    CORS_ALLOWED_ORIGINS = [
-        "http://localhost:8080",
-        "http://127.0.0.1:9000",
-        "http://localhost:3000",
-        "http://192.168.56.1:3000",
+CORS_ALLOWED_ORIGINS = [
+        cors_allowed_origin.strip() 
+        for cors_allowed_origin in os.getenv("CORS_ALLOWED_ORIGINS", "").split(",") 
+        if cors_allowed_origin.strip()
     ]
 
 MEDIA_URL = '/media/'

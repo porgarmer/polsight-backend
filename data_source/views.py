@@ -20,8 +20,8 @@ class CandidateViewSet(viewsets.ModelViewSet):
         return Response(data={"detail": "Candidate successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        return Response(data={"detail": "Candidate updated added."}, status=response.status_code)
+        response = super().update(request, *args, **kwargs)
+        return Response(data={"detail": "Candidate updated."}, status=response.status_code)
 
 
 class ElectionResultViewSet(viewsets.ModelViewSet):
@@ -35,7 +35,7 @@ class ElectionResultViewSet(viewsets.ModelViewSet):
         return Response(data={"detail": "Voter data successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
         return Response(data={"detail": "Voter data updated added."}, status=response.status_code)
     
     def partial_update(self, request, *args, **kwargs):
@@ -87,7 +87,7 @@ class CandidateVoteDataViewSet(viewsets.ModelViewSet):
         return Response(data={"detail": "Voter data successfully added."}, status=response.status_code)
     
     def update(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+        response = super().update(request, *args, **kwargs)
         return Response(data={"detail": "Voter data updated added."}, status=response.status_code)
     
 class ESIForecastView(views.APIView):
